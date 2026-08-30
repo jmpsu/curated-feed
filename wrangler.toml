@@ -1,0 +1,59 @@
+name = "curated-stream"
+main = "src/index.ts"
+env = "development"
+compatibility_date = "2025-01-01"
+compatibility_flags = ["nodejs_compat"]
+
+# Development database binding
+[[d1_databases]]
+binding = "DB"
+database_name = "curated_stream_db"
+database_id = "local-dev"
+migrations_dir = "db/migrations"
+
+# R2 bucket for media storage (posters, exports)
+[[r2_buckets]]
+binding = "MEDIA_BUCKET"
+bucket_name = "curated-stream-media"
+preview_bucket_name = "curated-stream-media-preview"
+
+# KV namespace for session management and caching
+[[kv_namespaces]]
+binding = "SESSIONS"
+id = "sessions-namespace"
+preview_id = "sessions-preview"
+
+# Environment-specific configuration
+[env.production]
+routes = [
+  { pattern = "stream.joeysvault.app", zone_id = "prod-zone-id" }
+]
+vars = { ENVIRONMENT = "production", LOG_LEVEL = "info" }
+
+[[env.production.d1_databases]]
+binding = "DB"
+database_name = "curated_stream_db_prod"
+database_id = "prod-db-id"
+
+[[env.production.r2_buckets]]
+binding = "MEDIA_BUCKET"
+bucket_name = "curated-stream-media-prod"
+
+[env.staging]
+routes = [
+  { pattern = "stream-staging.joeysvault.app", zone_id = "staging-zone-id" }
+]
+vars = { ENVIRONMENT = "staging", LOG_LEVEL = "debug" }
+
+[[env.staging.d1_databases]]
+binding = "DB"
+database_name = "curated_stream_db_staging"
+database_id = "staging-db-id"
+
+[[env.staging.r2_buckets]]
+binding = "MEDIA_BUCKET"
+bucket_name = "curated-stream-media-staging"
+
+# Cron jobs for ingestion (Phase 7+)
+# [triggers]
+# crons = ["0 */6 * * *"]  # Every 6 hours, once implemented
